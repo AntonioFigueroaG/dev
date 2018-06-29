@@ -16,6 +16,7 @@
     100% {background-color:#C8C8C8;}
 	}	
 </style>
+<!--//Animation on set new element-->
 <?php
 	date_default_timezone_set('america/Chihuahua');
 	$kiosko = $_GET['kiosko'];
@@ -60,15 +61,8 @@
 <style>
 	.c{background-color: #2CB940; border-color:#1A5C17;border-left:none; border-top: none; border-bottom:10%; width: 150px; height: 75px;}
 	.c:hover{background-color: #1AE937; border-color:#1A5C17;border-left:none; border-top: none; border-bottom:10%; width: 150px; height: 75px;}
-	<?php
-		if($AKA != "start"){
-		echo(".columnaF {width:24.81%;float:left;margin: 0px;}
-		.columnaC {width:50%;float:left;margin: 0px;border-left-style: groove;border-right-style: groove;}");
-		}else{
-		echo(".columnaF {width:24.23%;float:left;margin: 0px;}
-		.columnaC {width:75.4%;float:left;margin: 0px;border-left-style: groove;border-right-style: groove;}");
-		}
-	?>
+	.columnaF {width:24.81%;float:left;margin: 0px;}
+	.columnaC {width:50%;float:left;margin: 0px;border-left-style: groove;border-right-style: groove;}
 	.hed {background-color: #3F4BD7;}
 	.field{text-align: center;border-radius: 1px;}	
 	.selected {background-color: brown;color: #FFF;}
@@ -77,10 +71,9 @@
 	td:hover {background-color:#7D7D7D; padding: 15px; cursor: pointer;animation-iteration-count: 0;}
 	input{font-size:18px;padding:10px 10px 10px 5px;display:block;width:300px;border:none;border-bottom:1px solid #757575;}
 </style>
+<!--//End of style-->
 <body style="background-color: #FFFFFF; margin: 0px">
-	<?php
-	if($AKA != "start"){
-	echo("<div class='columnaF'>
+	<div class='columnaF'>
 		<center>
 			<div class='hed'>
 				<table class='table'>
@@ -93,8 +86,10 @@
 			</div>
 			<div>
 				<table class='table' id='table'>
-					<tbody>");
-							//Third database query-Get the vin's of the table
+					<tbody>
+						<?php
+						//Third database query-Get the vin's of the table
+						if($kiosko != "start"){
 							$x = 0;
 							$i = 0;
 							$query = "SELECT vin FROM kioskoLog ORDER BY vin ASC";
@@ -157,13 +152,23 @@
 								}
 							}
 							$objJSON = json_encode($variab);
-					echo("</tbody>
+						}else{
+							$query = "SELECT * FROM pruebas where started = 0";
+							$result = mysqli_query( $conection, $query ) or die ( "Something went wrong in the query to the database5");
+								while ($columna = mysqli_fetch_array( $result )){
+									$variaa[]=array("vin" => $columna['vin'], "description" => $columna['description']);
+									echo("<tr>");
+									echo("<td style='animation-name: example;animation-duration: 4s;animation-iteration-count: 1;'>".$columna['vin']."</td>");
+									echo("</tr>");
+								}
+								$objJSONS = json_encode($variaa);
+						}
+						?>
+					</tbody>
 				</table>
 			</div>
 		</center>
-	</div>");
-	}
-	?>
+	</div>
 	<div class="columnaC">
 		<center>
 			<div class="hed">
@@ -207,11 +212,11 @@
 						<tr>
 							<?php
 								if($AKA == "pass"){
-									echo("<button onclick=\"pass()\" class='c'>pass</button>");
+									echo("<button onclick=\"save('pass')\" class='c'>pass</button>");
 								}else{
 									if($AKA=="start-end"){
-										echo("<button id='st' onclick=\"st()\" class='c'>start</button>");
-										echo("<button onclick=\"ed()\" class='c'>end</button>");
+										echo("<button id='st' onclick=\"save('start')\" class='c'>start</button>");
+										echo("<button onclick=\"save('end')\" class='c'>end</button>");
 									}else{
 										if($AKA=="start"){
 											echo("<button onclick=\"start()\" class='c'>start</button>");
@@ -310,77 +315,31 @@ function start(){
 		}
 	});
 }
-function st(){
+function save(action){
 	var x = $("#vin").val();
 	var y = $("#vinD").val();
-	var date = moment().format('YYYY-MM-DD H:mm:ss');
-	var parametros = {
-		"station" : "<?php echo($KSTA); ?>",
-		"action" : "start",
-		"stamp" : date,
-		"vin" : x,
-		"description" : y
-	};
-	$.ajax({
-		data:  parametros,
-		url:   'kioskoMSC/SaveProg.php',
-		type:  'post',
-		beforeSend: function () {
-		},
-		success:  function () {
-			var x = $("#vin").val('');
-			var y = $("#vinD").val('');
-			location.reload();
-		}
-	});
-}
-function ed(){
-	var x = $("#vin").val();
-	var y = $("#vinD").val();
-	var date = moment().format('YYYY-MM-DD H:mm:ss');
-	var parametros = {
-		"station" : "<?php echo($KSTA); ?>",
-		"action" : "end",
-		"stamp" : date,
-		"vin" : x,
-		"description" : y
-	};
-	$.ajax({
-		data:  parametros,
-		url:   'kioskoMSC/SaveProg.php',
-		type:  'post',
-		beforeSend: function () {
-		},
-		success:  function () {
-			var x = $("#vin").val('');
-			var y = $("#vinD").val('');
-			location.reload();
-		}
-	});
-}
-function pass(){
-	var x = $("#vin").val();
-	var y = $("#vinD").val();
-	var date = moment().format('YYYY-MM-DD H:mm:ss');
-	var parametros = {
-		"station" : "<?php echo($KSTA); ?>",
-		"action" : "pass",
-		"stamp" : date,
-		"vin" : x,
-		"description" : y
-	};
-	$.ajax({
-		data:  parametros,
-		url:   'kioskoMSC/SaveProg.php',
-		type:  'post',
-		beforeSend: function () {
-		},
-		success:  function () {
-			var x = $("#vin").val('');
-			var y = $("#vinD").val('');
-			location.reload();
-		}
-	});
+	if(y != "" && x!= "" ){
+		var date = moment().format('YYYY-MM-DD H:mm:ss');
+		var parametros = {
+			"station" : "<?php echo($KSTA); ?>",
+			"action" : action,
+			"stamp" : date,
+			"vin" : x,
+			"description" : y
+		};
+		$.ajax({
+			data:  parametros,
+			url:   'kioskoMSC/SaveProg.php',
+			type:  'post',
+			beforeSend: function () {
+			},
+			success:  function () {
+				var x = $("#vin").val('');
+				var y = $("#vinD").val('');
+				location.reload();
+			}
+		});
+	}	
 }
 $("#table tr").click(function(){
    	$(this).addClass('selected').siblings().removeClass('selected');    
@@ -392,14 +351,26 @@ $('.ok').on('click', function(e){
     alert($("#table tr.selected td:first").html());
 });
 function none(t){
-	var json =<?php if(isset($objJSON)){echo($objJSON);}else{echo("null");} ?>;
-	for(x = 0; x < json.length; x++){
-		if(json[x].vin == t){
-		    var s = document.getElementById('vin');
-            s.value = (json[x].vin);
-			var s = document.getElementById('vinD');
-            s.value = (json[x].description);
-	   }
+	if("<?php echo($kiosko); ?>" != "start"){
+		var json =<?php if(isset($objJSON)){echo($objJSON);}else{echo("null");} ?>;
+		for(x = 0; x < json.length; x++){
+			if(json[x].vin == t){
+				var s = document.getElementById('vin');
+				s.value = (json[x].vin);
+				var s = document.getElementById('vinD');
+				s.value = (json[x].description);
+		   }
+		}
+	}else{
+		var json =<?php if(isset($objJSONS)){echo($objJSONS);}else{echo("null");} ?>;
+		for(x = 0; x < json.length; x++){
+			if(json[x].vin == t){
+				var s = document.getElementById('vin');
+				s.value = (json[x].vin);
+				var s = document.getElementById('vinD');
+				s.value = (json[x].description);
+		   }
+		}
 	}
 }
 </script>
