@@ -16,6 +16,7 @@
     100% {background-color:#C8C8C8;}
 	}	
 </style>
+<!--//Animation on set new element-->
 <?php
 	date_default_timezone_set('america/Chihuahua');
 	$kiosko = $_GET['kiosko'];
