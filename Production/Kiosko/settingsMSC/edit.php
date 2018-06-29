@@ -22,6 +22,12 @@ if(mysqli_num_rows($cn)!=0){
 	echo "Existing kiosko";
 }else{
 $consulta = "UPDATE kioskoSettings SET `kiosko`='$newname',`action`='$newaction' WHERE `kiosko`= '$viejoname'";
+$consultasa = "UPDATE kioskoLog SET `station`='$newname' WHERE `station` ='$viejoname'";
+if(mysqli_query($conexion, $consultasa)){
+    echo "Records added successfully.";
+} else{
+    echo "<p>ERROR: Could not able to execute</p> $consulta." . mysqli_error($conexion);
+}	
 if(mysqli_query($conexion, $consulta)){
     echo "Records added successfully.";
 } else{
